@@ -59,7 +59,7 @@ namespace upm {
      * @param a pins for address
      * @param d pins for data read and write
     */
-    i3101(int cs, int write, int a[], int d[]);
+    i3101();
     /**
      * i3101 Destructor
      */
@@ -84,6 +84,9 @@ namespace upm {
 
   private:
     int cs; int write; int a[]; int d[];
-    mraa_gpio_context m_gpio;
-  };
+    mraa_gpio_context m_gpio_a[4];
+    mraa_gpio_context m_gpio_d[4];
+    mraa_gpio_context m_gpio_w[4];
+    mraa_gpio_context m_gpio_cs;
+    mraa_gpio_context m_gpio_write;
 }
