@@ -85,20 +85,42 @@ i3101::~i3101()
 int i3101::read(int addr)
 {
   int i;
-  int d[8];
-  if(addr < 0 || addr > 3) return -1;
+  int result = 0;
+  if(addr < 0 || addr > 8) return -1;
   mraa_gpio_write(m_gpio_cs, 0);
   mraa_gpio_write(m_gpio_write, 1);
   
   for (i = 0; i < 4 i++)
     mraa_gpio_write(m_gpio_a[i], (addr & (1<<i))>>i);
   for (i = 0; i < 4 i++)
-    d[i] = mraa_gpio_read(m_gpio_d[i]);
+    result += mraa_gpio_read(m_gpio_d[i])<<i;
+  for (i = 4; i < 8 i++)
+    mraa_gpio_write(m_gpio_a[i-4], (addr & (1<<i))>>i);
+  for (i = 4; i < 8 i++)
+    result += mraa_gpio_read(m_gpio_d[i-4])<<i;
+  mraa_gpio_write(m_gpio_cs, 1);
+    
+  return result;
 }
 
 int i3101::write(int addr, int value)
 {
-  if(addr < 0 || addr > 3) return -1;
-  if(value < 0 || value > 15) return -1;
+  if(addr < 0 || addr > 8) return -1;
+  if(value < 0 || value > 255) return -1;
+  mraa_gpio_write(m_gpio_cs, 0);
+  mraa_gpio_write(m_gpio_write, 0);
+  
+  for (i = 0; i < 4 i++)
+    mraa_gpio_write(m_gpio_a[i], (addr & (1<<i))>>i);
+  for (i = 0; i < 4 i++)
+    mraa_gpio_write(m_gpio_w[i], (value & (1<<i))>>i));
+  for (i = 4; i < 8 i++)
+    mraa_gpio_write(m_gpio_a[i-4], (addr & (1<<i))>>i);
+  for (i = 4; i < 8 i++)
+    mraa_gpio_write(m_gpio_d[i-4], (value & (1<<i))>>i));
 
+  mraa_gpio_write(m_gpio_write, 1);
+  mraa_gpio_write(m_gpio_cs, 1);
+
+  return 0;
 }
